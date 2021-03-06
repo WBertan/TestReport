@@ -1,0 +1,51 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    ext.kotlin_version = "1.4.30"
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.0.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+        classpath "org.jacoco:org.jacoco.core:0.8.6"
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+subprojects { project ->
+    project.afterEvaluate {
+        if (project.hasProperty('android')) {
+            android.testOptions {
+                unitTests.includeAndroidResources = true
+            }
+        }
+    }
+}
+
+def enableCoverage() {
+    return project.findProperty('enableCoverage') == "true"
+}
+
+if (enableCoverage()) {
+    apply from: "${project.rootDir}/coverage-project.gradle"
+} else {
+    task projectCodeCoverageReport() {
+        println("Code coverage disabled, please use -PenableCoverage=true to enable.")
+    }
+}

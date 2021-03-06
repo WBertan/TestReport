@@ -1,0 +1,4 @@
+include ':lib_b'
+include ':lib_a'
+include ':app'
+rootProject.name = "TestReport"

@@ -1,0 +1,50 @@
+apply from: "${project.rootDir}/coverage-common.gradle"
+
+subprojects { project ->
+    project.afterEvaluate {
+        if (project.hasProperty('android')) {
+            project.apply from: '../coverage-module.gradle'
+
+            android.buildTypes {
+                debug { testCoverageEnabled = true }
+            }
+            android.testOptions {
+                unitTests.all {
+                    jacoco {
+                        includeNoLocationClasses = true
+                        excludes = ['jdk.internal.*']
+                    }
+                }
+            }
+        }
+    }
+}
+
+task projectCodeCoverageReport(type: JacocoReport) {
+
+    group = "Reporting"
+    description = "Generate Project Jacoco coverage reports after running tests for all modules."
+
+    reports {
+        xml.enabled = true
+        html.enabled true
+    }
+
+    gradle.projectsEvaluated {
+        subprojects.each {
+            def coverageSourceDirs = commonCoverageSourceDirs(it)
+            def javaClasses = commonJavaClasses(it)
+            def kotlinClasses = commonKotlinClasses(it)
+
+            classDirectories.from(files([javaClasses], [kotlinClasses]))
+            additionalSourceDirs.from(files(coverageSourceDirs))
+            sourceDirectories.from(files(coverageSourceDirs))
+
+            executionData.from(commonExecutionData(it))
+        }
+    }
+}
+
+projectCodeCoverageReport.dependsOn {
+    subprojects*.moduleCodeCoverageReport
+}

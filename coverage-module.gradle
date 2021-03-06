@@ -1,0 +1,27 @@
+apply from: "${project.rootDir}/coverage-common.gradle"
+
+task moduleCodeCoverageReport(type: JacocoReport) {
+    if (project.tasks.findByName('connectedDebugAndroidTest')) {
+        dependsOn('testDebugUnitTest', 'connectedDebugAndroidTest', 'createDebugCoverageReport')
+    } else {
+        dependsOn('testDebugUnitTest', 'createDebugCoverageReport')
+    }
+
+    group = "Reporting"
+    description = "Generate Module Jacoco coverage reports after running tests."
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    def coverageSourceDirs = commonCoverageSourceDirs(project)
+    def javaClasses = commonJavaClasses(project)
+    def kotlinClasses = commonKotlinClasses(project)
+
+    classDirectories.setFrom(files([javaClasses], [kotlinClasses]))
+    additionalSourceDirs.setFrom(files(coverageSourceDirs))
+    sourceDirectories.setFrom(files(coverageSourceDirs))
+
+    executionData.setFrom(commonExecutionData(project))
+}
