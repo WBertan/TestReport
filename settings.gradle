@@ -2,3 +2,5 @@ include ':lib_b'
 include ':lib_a'
 include ':app'
 rootProject.name = "TestReport"
+include ':lib_c:lib_c_one'
+include ':lib_c:lib_c_two'

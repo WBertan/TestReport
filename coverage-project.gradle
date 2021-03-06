@@ -3,7 +3,7 @@ apply from: "${project.rootDir}/coverage-common.gradle"
 subprojects { project ->
     project.afterEvaluate {
         if (project.hasProperty('android')) {
-            project.apply from: '../coverage-module.gradle'
+            project.apply from: "${project.rootDir}/coverage-module.gradle"
 
             android.buildTypes {
                 debug { testCoverageEnabled = true }
@@ -16,6 +16,8 @@ subprojects { project ->
                     }
                 }
             }
+        } else {
+            task moduleCodeCoverageReport(type: JacocoReport) {}
         }
     }
 }
