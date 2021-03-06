@@ -22,7 +22,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        debug {}
+    }
+    variantFilter { variant ->
+        if (!project.hasProperty('enableCoverage') && variant.buildType.name != "release") {
+            setIgnore(true)
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
