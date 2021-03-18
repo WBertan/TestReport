@@ -11,6 +11,8 @@ buildscript {
 
         classpath "org.jacoco:org.jacoco.core:0.8.6"
 
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.1.1"
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -44,6 +46,7 @@ def enableCoverage() {
 
 if (enableCoverage()) {
     apply from: "${project.rootDir}/coverage-project.gradle"
+    apply plugin: "org.sonarqube"
 } else {
     task projectCodeCoverageReport() {
         println("Code coverage disabled, please use -PenableCoverage=true to enable.")

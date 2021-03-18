@@ -1,4 +1,5 @@
 apply from: "${project.rootDir}/coverage-common.gradle"
+apply plugin: "org.sonarqube"
 
 subprojects { project ->
     project.afterEvaluate {
@@ -43,6 +44,12 @@ task projectCodeCoverageReport(type: JacocoReport) {
             sourceDirectories.from(files(coverageSourceDirs))
 
             executionData.from(commonExecutionData(it))
+
+            sonarqube {
+                properties {
+                    property "sonar.coverage.jacoco.xmlReportPaths", "$buildDir/coverageReport/projectCodeCoverageReport/projectCodeCoverageReport.xml"
+                }
+            }
         }
     }
 }
@@ -50,3 +57,16 @@ task projectCodeCoverageReport(type: JacocoReport) {
 projectCodeCoverageReport.dependsOn {
     subprojects*.moduleCodeCoverageReport
 }
+
+sonarqube {
+    properties {
+        property "sonar.host.url", getEnvironmentVariable("SONARQUBE_URL")
+        property "sonar.login", getEnvironmentVariable("SONARQUBE_LOGIN")
+        property "sonar.projectVersion", getGitHash()
+        property "sonar.projectKey", "test-report"
+        property "sonar.java.coveragePlugin", "jacoco"
+        property "sonar.coverage.exclusions", commonFileFilter.join(",")
+    }
+}
+
+tasks.sonarqube.dependsOn "projectCodeCoverageReport"

@@ -20,12 +20,22 @@ ext {
             '**/BuildConfig.*',
             '**/Manifest*.*',
             '**/*Test*.*',
+            '**/android/databinding/*',
+            '**/androidx/databinding/*',
             '**/*$ViewInjector*.*',
             '**/*$ViewBinder*.*',
             '**/*_ViewBinding*.*',
             '**/*$inlined$*.*',
             '**/*$Parcelable*.*',
-            'android/**/*.*'
+            'android/**/*.*',
+            '**/*Module.*', /* filtering Dagger classes */
+            '**/*Dagger*.*', /* filtering Dagger classes */
+            '**/*MembersInjector*.*', /* filtering Dagger classes */
+            '**/Hilt_*.*', /* filtering Hilt classes */
+            '**/*_Factory*.*', /* filtering Hilt classes */
+            '**/com_wbertan_*.*', /* filtering Hilt classes */
+            '**/*Args*.*', /* filtering Navigation Component generated classes */
+            '**/*Directions*.*', /* filtering Navigation Component generated classes */
     ]
     commonJavaClasses = { project ->
         return fileTree(
@@ -44,5 +54,25 @@ ext {
                 "jacoco/testDebugUnitTest.exec",
                 "outputs/code_coverage/debugAndroidTest/connected/*coverage.ec"
         ])
+    }
+    getPropertiesFromFile = { fileName ->
+        def properties = new Properties()
+        file(fileName).withInputStream { properties.load(it) }
+        return properties
+    }
+    getEnvironmentVariable = { key ->
+        String value = System.getenv(key) ?: getPropertiesFromFile("local.properties")[key]
+        if (value == null) {
+            throw new GradleException("The key $key is missing from local.properties.")
+        }
+        return value
+    }
+    getGitHash = { ->
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-parse', '--short', 'HEAD'
+            standardOutput = stdout
+        }
+        return stdout.toString().trim()
     }
 }
