@@ -11,8 +11,8 @@ task moduleCodeCoverageReport(type: JacocoReport) {
     description = "Generate Module Jacoco coverage reports after running tests."
 
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.required = true
+        html.required = true
     }
 
     def coverageSourceDirs = commonCoverageSourceDirs(project)

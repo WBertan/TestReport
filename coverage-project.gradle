@@ -29,8 +29,8 @@ task projectCodeCoverageReport(type: JacocoReport) {
     description = "Generate Project Jacoco coverage reports after running tests for all modules."
 
     reports {
-        xml.enabled = true
-        html.enabled true
+        xml.required = true
+        html.required = true
     }
 
     gradle.projectsEvaluated {
